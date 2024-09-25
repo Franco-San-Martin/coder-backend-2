@@ -2,14 +2,31 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
-
+const logger = require('./utils/logger'); // Importar el logger
 const users = require('./routes/users');
 const sessions = require('./routes/sessions');
-
+const { errorHandler } = require('./middleware/errorHandler');
 const app = express();
 
 // Conectar a MongoDB
 mongoose.connect('mongodb://localhost/ecommerce', { useNewUrlParser: true, useUnifiedTopology: true });
+
+
+// Ejemplo de uso de logs en puntos importantes del servidor
+app.get('/loggerTest', (req, res) => {
+    logger.debug('Este es un log de nivel debug');
+    logger.http('Este es un log de nivel http');
+    logger.info('Este es un log de nivel info');
+    logger.warning('Este es un log de nivel warning');
+    logger.error('Este es un log de nivel error');
+    logger.log('fatal', 'Este es un log de nivel fatal'); // O puedes usar logger.fatal directamente
+
+    res.send('Logs probados. Revisa la consola y el archivo errors.log.');
+});
+
+// Manejar errores
+const { errorHandler } = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 // Middleware
 app.use(express.json());
@@ -21,6 +38,14 @@ require('./config/passport')(passport);
 // Rutas
 app.use('/api/users', users);
 app.use('/api/sessions', sessions);
+const petsRouter = require('./routes/pets');
+app.use('/api/pets', petsRouter);
+app.use(errorHandler);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Servidor corriendo en el puerto ${port}`));
+
+
+app.listen(process.env.PORT || 3000, () => {
+    console.log(`Servidor corriendo en el puerto ${process.env.PORT || 3000}`);
+});
