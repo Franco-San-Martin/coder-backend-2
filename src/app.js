@@ -7,6 +7,7 @@ const users = require('./routes/users');
 const sessions = require('./routes/sessions');
 const { errorHandler } = require('./middleware/errorHandler');
 const app = express();
+const mocksRouter = require('./routes/mocks.router');
 
 // Conectar a MongoDB
 mongoose.connect('mongodb://localhost/ecommerce', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -41,6 +42,9 @@ app.use('/api/sessions', sessions);
 const petsRouter = require('./routes/pets');
 app.use('/api/pets', petsRouter);
 app.use(errorHandler);
+
+// Usar el router de mocks
+app.use('/api/mocks', mocksRouter);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Servidor corriendo en el puerto ${port}`));

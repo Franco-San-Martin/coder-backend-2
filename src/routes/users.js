@@ -3,14 +3,23 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const logger = require('../utils/logger'); // Importar el logger
+
 
 // Registrar usuario
-router.post('/register', (req, res) => {
-    const { first_name, last_name, email, age, password } = req.body;
-    const newUser = new User({ first_name, last_name, email, age, password });
-    newUser.save()
-        .then(user => res.json(user))
-        .catch(err => res.status(400).json({ error: err.message }));
+router.post('/register', async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            logger.warning('Intento de registro sin email o password');
+            throw new Error('Faltan datos requeridos');
+        }
+        logger.info(`Usuario registrado con éxito: ${email}`);
+        res.status(201).json({ message: 'Usuario registrado' });
+    } catch (err) {
+        logger.error('Error en el registro del usuario', err);
+        next(err); // Enviar al middleware de errores
+    }
 });
 
 // Login de usuario
