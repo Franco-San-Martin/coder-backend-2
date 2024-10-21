@@ -1,26 +1,20 @@
-const User = require('../../models/User');
+const mongoose = require('mongoose');
 
-class UserDao {
-    async createUser(userData) {
-        const user = new User(userData);
-        return await user.save();
-    }
+const userSchema = new mongoose.Schema({
+    first_name: { type: String, required: true },
+    last_name: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
+    age: { type: Number, required: true },
+    password: { type: String, required: true },
+    cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
+    role: { type: String, default: 'user' },
+    documents: [
+        {
+            name: { type: String, required: true },
+            reference: { type: String, required: true }
+        }
+    ],
+    last_connection: { type: Date }
+});
 
-    async getUserById(id) {
-        return await User.findById(id);
-    }
-
-    async getUserByEmail(email) {
-        return await User.findOne({ email: email });
-    }
-
-    async updateUser(id, updateData) {
-        return await User.findByIdAndUpdate(id, updateData, { new: true });
-    }
-
-    async deleteUser(id) {
-        return await User.findByIdAndDelete(id);
-    }
-}
-
-module.exports = UserDao;
+module.exports = mongoose.model('User', userSchema);

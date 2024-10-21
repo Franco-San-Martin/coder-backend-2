@@ -5,9 +5,11 @@ const cookieParser = require('cookie-parser');
 const logger = require('./utils/logger'); // Importar el logger
 const users = require('./routes/users');
 const sessions = require('./routes/sessions');
-const { errorHandler } = require('./middleware/errorHandler');
 const app = express();
 const mocksRouter = require('./routes/mocks.router');
+const swaggerApp = require('./swagger');
+const swaggerDocs = require('./config/swaggerConfig');
+const { errorHandler } = require('./middleware/errorHandler');
 
 // Conectar a MongoDB
 mongoose.connect('mongodb://localhost/ecommerce', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -26,7 +28,6 @@ app.get('/loggerTest', (req, res) => {
 });
 
 // Manejar errores
-const { errorHandler } = require('./middleware/errorHandler');
 app.use(errorHandler);
 
 // Middleware
@@ -53,3 +54,8 @@ app.listen(port, () => console.log(`Servidor corriendo en el puerto ${port}`));
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Servidor corriendo en el puerto ${process.env.PORT || 3000}`);
 });
+
+// Usar Swagger para la documentación
+app.use(swaggerApp);
+
+swaggerDocs(app); // Llama a la función para servir la documentación
